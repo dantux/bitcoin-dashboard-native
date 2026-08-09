@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import subprocess
 import threading
 import time
@@ -14,9 +15,9 @@ def bitcoin_rpc(method, params=None):
     import urllib.request
     import json
     import base64
-    url = "http://127.0.0.1:8332"
-    user = "marian"
-    password = "M@rianB0ricean2503"
+    url = os.environ.get("BITCOIN_RPC_URL", "http://127.0.0.1:8332")
+    user = os.environ.get("BITCOIN_RPC_USER", "marian")
+    password = os.environ.get("BITCOIN_RPC_PASSWORD", "")
     auth = base64.b64encode(f"{user}:{password}".encode()).decode()
     headers = {"Authorization": f"Basic {auth}", "Content-Type": "application/json"}
     data = json.dumps({"jsonrpc": "1.0", "id": "dashboard", "method": method, "params": params or []}).encode()

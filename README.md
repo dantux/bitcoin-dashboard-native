@@ -16,15 +16,33 @@ A lightweight, self-hosted status dashboard for a **Bitcoin Knots** node. This i
 ## Requirements
 
 - Python 3.8+
-- Running Bitcoin Knots node with RPC enabled (`rpcuser` / `rpcpassword` configured)
+- Running Bitcoin Knots node with RPC enabled
 - The dashboard connects directly to the local `bitcoind` via JSON-RPC
+
+### Environment Variables (required)
+
+| Variable                  | Description                          | Default                  |
+|---------------------------|--------------------------------------|--------------------------|
+| `BITCOIN_RPC_URL`         | Bitcoin RPC endpoint                 | `http://127.0.0.1:8332` |
+| `BITCOIN_RPC_USER`        | RPC username                         | `marian`                |
+| `BITCOIN_RPC_PASSWORD`    | RPC password (or rpcauth equivalent) | *(required)*            |
+
+### Systemd Service Configuration
+
+If running via `bitcoin-dashboard.service`, add the variables to the service file:
+
+```ini
+[Service]
+Environment="BITCOIN_RPC_PASSWORD=yourpassword"
+# Or use an EnvironmentFile for better security
+```
 
 ## Running
 
 ### Manual start
 
 ```bash
-python3 app.py --host 0.0.0.0 --port 8335
+BITCOIN_RPC_PASSWORD=yourpassword python3 app.py --host 0.0.0.0 --port 8335
 ```
 
 Then open: `http://your-server:8335`
