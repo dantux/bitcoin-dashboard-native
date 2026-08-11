@@ -13,6 +13,27 @@ A lightweight, self-hosted status dashboard for a **Bitcoin Knots** node. This i
 - Clean, responsive interface
 - Background auto-refresh
 
+## Installation & Setup
+
+### 1. Prepare the environment file
+
+```bash
+cp bitcoin-dashboard.env.example ~/.config/bitcoin-dashboard.env
+nano ~/.config/bitcoin-dashboard.env
+```
+
+Set your RPC password (the plain-text password that matches your `rpcauth` line in `bitcoin.conf`).
+
+### 2. Enable the user service
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now bitcoin-dashboard.service
+systemctl --user status bitcoin-dashboard.service
+```
+
+Access the dashboard at `http://your-pi-ip:8335`.
+
 ## Requirements
 
 - Python 3.8+
@@ -38,16 +59,6 @@ The dashboard connects to your Bitcoin Knots node using HTTP Basic Auth.
 
 This design keeps your node credentials secure while allowing the dashboard to authenticate locally.
 
-### Systemd Service Configuration
-
-If running via `bitcoin-dashboard.service`, add the variables to the service file:
-
-```ini
-[Service]
-Environment="BITCOIN_RPC_PASSWORD=yourpassword"
-# Or use an EnvironmentFile for better security
-```
-
 ## Running
 
 ### Manual start
@@ -60,16 +71,44 @@ Then open: `http://your-server:8335`
 
 ### Systemd (recommended)
 
-A user service is provided:
+Create the user service file at:
 
 ```bash
-systemctl --user status bitcoin-dashboard.service
-systemctl --user restart bitcoin-dashboard.service
-journalctl --user -u bitcoin-dashboard.service -f
+mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/bitcoin-dashboard.service
 ```
 
-The service file is located at:
-`~/.config/systemd/user/bitcoin-dashboard.service`
+**Example `bitcoin-dashboard.service`:**
+
+```ini
+[Unit]
+Description=Bitcoin Dashboard
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/bitcoin-dashboard.env
+WorkingDirectory=%h/bitcoin-dashboard
+ExecStart=/usr/bin/python3 %h/bitcoin-dashboard/app.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
+```
+
+> **Note:** Adjust `WorkingDirectory` and `ExecStart` if you installed the dashboard in a different location.
+
+Then enable and start it:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now bitcoin-dashboard.service
+systemctl --user status bitcoin-dashboard.service
+journalctl --user -u bitcoin-dashboard.service -f
+```
 
 ## API Endpoints
 
@@ -80,9 +119,18 @@ The service file is located at:
 
 ## Configuration
 
-The dashboard reads Bitcoin RPC credentials directly from the `bitcoin_rpc()` function inside `app.py`. Update the credentials there if your `rpcuser`/`rpcpassword` differ.
+All sensitive configuration lives in the environment file:
 
-Default port: **8335**
+```bash
+~/.config/bitcoin-dashboard.env
+```
+
+**Important:**
+- `BITCOIN_RPC_PASSWORD` must be the **plain-text** password that matches the `rpcauth` entry in your `bitcoin.conf`.
+- If you change the password or regenerate the `rpcauth` line in `bitcoin.conf`, you **must restart `bitcoind`** for the new credentials to take effect.
+- The dashboard never edits or stores credentials itself — it only reads from the environment at startup.
+
+Default listening port: **8335**
 
 ## Project Structure
 

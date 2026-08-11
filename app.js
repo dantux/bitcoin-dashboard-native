@@ -140,7 +140,8 @@ function renderRecentBlocks(blocks) {
     return;
   }
   const now = Math.floor(Date.now() / 1000);
-  const html = blocks.slice(0, 6).map((b) => {
+  const shownBlocks = blocks.slice(0, 6);
+  const html = shownBlocks.map((b) => {
     const ageSec = now - (b.time || now);
     const age = fmtRelativeTime(ageSec);
     const sizeMB = b.size ? (b.size / 1024 / 1024).toFixed(2) + " MB" : "--";
@@ -156,7 +157,7 @@ function renderRecentBlocks(blocks) {
     `;
   }).join("");
   grid.innerHTML = html;
-  if (summary) summary.textContent = `${blocks.length} blocks`;
+  if (summary) summary.textContent = `${shownBlocks.length} blocks`;
 }
 
 function renderPeers(peers) {
