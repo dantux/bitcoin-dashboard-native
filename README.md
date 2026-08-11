@@ -27,6 +27,17 @@ A lightweight, self-hosted status dashboard for a **Bitcoin Knots** node. This i
 | `BITCOIN_RPC_USER`        | RPC username                         | `marian`                |
 | `BITCOIN_RPC_PASSWORD`    | RPC password (or rpcauth equivalent) | *(required)*            |
 
+### How RPC Authentication Works
+
+The dashboard connects to your Bitcoin Knots node using HTTP Basic Auth.
+
+- The dashboard reads a plain-text password from the `BITCOIN_RPC_PASSWORD` environment variable.
+- Your `bitcoin.conf` must contain a matching `rpcauth` entry in the format `rpcauth=username:salt$hash`.
+- The plain-text password in the dashboard's environment file must be the same password used to generate that `rpcauth` line.
+- Never store the plain password in `bitcoin.conf` — only the salted hash belongs there.
+
+This design keeps your node credentials secure while allowing the dashboard to authenticate locally.
+
 ### Systemd Service Configuration
 
 If running via `bitcoin-dashboard.service`, add the variables to the service file:
