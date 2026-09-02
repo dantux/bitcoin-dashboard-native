@@ -245,14 +245,15 @@ button:hover {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 10px;
   margin: 18px 0;
 }
 
 .metric {
   min-height: 94px;
-  padding: 16px;
+  min-width: 0;
+  padding: 14px 12px;
 }
 
 .metric span {
