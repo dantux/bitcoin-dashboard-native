@@ -11,6 +11,34 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
+def format_knots_version(subversion):
+    if not subversion:
+        return None
+    parts = [part for part in str(subversion).split("/") if part]
+    satoshi = None
+    knots = None
+    for part in parts:
+        if part.startswith("Satoshi:"):
+            satoshi = part.split(":", 1)[1]
+        elif part.startswith("Knots:"):
+            knots = part.split(":", 1)[1]
+    if satoshi and knots:
+        return f"{satoshi} / Knots {knots}"
+    if satoshi:
+        return satoshi
+    cleaned = str(subversion).strip("/")
+    return cleaned or None
+
+
+def format_header_eyebrow(knots_version, host="knots-pi5"):
+    if not knots_version:
+        return f"Bitcoin Knots · {host}"
+    if " / Knots " in knots_version:
+        satoshi, knots = knots_version.split(" / Knots ", 1)
+        return f"Bitcoin Knots · {satoshi} (Knots {knots}) · {host}"
+    return f"Bitcoin Knots · {knots_version} · {host}"
+
+
 def bitcoin_rpc(method, params=None):
     import urllib.request
     import json
@@ -321,6 +349,7 @@ def collect_status():
         "network": {
             "version": network.get("version"),
             "subversion": network.get("subversion"),
+            "knots_version": format_knots_version(network.get("subversion")),
             "protocolversion": network.get("protocolversion"),
             "localaddresses": network.get("localaddresses", []),
             "reachable": network_reachability,

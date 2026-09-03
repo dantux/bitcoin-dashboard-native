@@ -33,6 +33,22 @@ class MainPageLayoutTests(unittest.TestCase):
             parser.headings.index("Services"),
         )
 
+    def test_services_panel_includes_knots_version(self):
+        html = Path("index.html").read_text()
+        js = Path("app.js").read_text()
+
+        self.assertIn('<div><dt>Version</dt><dd id="knots-version">--</dd></div>', html)
+        self.assertIn('knots-version', js)
+
+    def test_header_includes_knots_version_eyebrow(self):
+        html = Path("index.html").read_text()
+        js = Path("app.js").read_text()
+
+        self.assertIn('id="node-eyebrow"', html)
+        self.assertIn("Bitcoin Knots · knots-pi5", html)
+        self.assertIn("node-eyebrow", js)
+        self.assertIn("formatHeaderEyebrow", js)
+
     def test_desktop_metric_cards_use_one_grid_row(self):
         html = Path("index.html").read_text()
         metric_count = len(re.findall(r'<article class="metric">', html))

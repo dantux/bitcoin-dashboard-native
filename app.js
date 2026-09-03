@@ -75,6 +75,29 @@ function serviceLabel(service) {
   return service.uptime_seconds ? `${state}, ${fmtSeconds(service.uptime_seconds)}` : state;
 }
 
+function formatKnotsVersion(subversion) {
+  if (!subversion) return "";
+  const parts = String(subversion).split("/").filter(Boolean);
+  let satoshi = "";
+  let knots = "";
+  for (const part of parts) {
+    if (part.startsWith("Satoshi:")) satoshi = part.split(":")[1] || "";
+    if (part.startsWith("Knots:")) knots = part.split(":")[1] || "";
+  }
+  if (satoshi && knots) return `${satoshi} / Knots ${knots}`;
+  if (satoshi) return satoshi;
+  return String(subversion).replaceAll("/", "").trim();
+}
+
+function formatHeaderEyebrow(knotsVersion, host = "knots-pi5") {
+  if (!knotsVersion) return `Bitcoin Knots · ${host}`;
+  if (knotsVersion.includes(" / Knots ")) {
+    const [satoshi, knots] = knotsVersion.split(" / Knots ");
+    return `Bitcoin Knots · ${satoshi} (Knots ${knots}) · ${host}`;
+  }
+  return `Bitcoin Knots · ${knotsVersion} · ${host}`;
+}
+
 function statusWord(value) {
   return value ? "OK" : "No";
 }
@@ -211,6 +234,15 @@ function render(data) {
   $("disk-size").textContent = fmtBytes(sync.size_on_disk_bytes);
 
   $("knots-service").textContent = serviceLabel(services.knots);
+  const versionEl = $("knots-version");
+  const knotsVersion = (data.network && (data.network.knots_version || formatKnotsVersion(data.network.subversion))) || "";
+  if (versionEl) {
+    versionEl.textContent = knotsVersion || "--";
+  }
+  const eyebrowEl = $("node-eyebrow");
+  if (eyebrowEl) {
+    eyebrowEl.textContent = formatHeaderEyebrow(knotsVersion);
+  }
   $("tor-service").textContent = serviceLabel(services.tor);
   if (services.onion_hostname) {
     $("tor-onion-address").textContent = services.onion_hostname;
