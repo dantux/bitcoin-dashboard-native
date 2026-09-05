@@ -243,6 +243,15 @@ button:hover {
   display: none;
 }
 
+.page-footer {
+  margin: 18px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));

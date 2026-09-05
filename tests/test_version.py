@@ -1,6 +1,12 @@
 import unittest
 
-from app import format_header_eyebrow, format_knots_version
+import os
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
+
+import app
+from app import dashboard_version, format_header_eyebrow, format_knots_version
 
 
 class KnotsVersionTests(unittest.TestCase):
@@ -25,3 +31,18 @@ class KnotsVersionTests(unittest.TestCase):
 
     def test_header_eyebrow_falls_back_without_version(self):
         self.assertEqual(format_header_eyebrow(None), "Bitcoin Knots · knots-pi5")
+
+
+class DashboardVersionTests(unittest.TestCase):
+    def test_dashboard_version_prefers_app_version_env(self):
+        with patch.dict(os.environ, {"APP_VERSION": "9.9.9"}, clear=True):
+            self.assertEqual(dashboard_version(), "9.9.9")
+
+    def test_dashboard_version_reads_version_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "VERSION"
+            path.write_text("1.2.3\n", encoding="utf-8")
+            with patch.dict(os.environ, {}, clear=True), patch.object(
+                app, "APP_DIR", Path(directory)
+            ):
+                self.assertEqual(dashboard_version(), "1.2.3")

@@ -141,6 +141,7 @@ bitcoin-dashboard/
 ├── index.html      # Main UI
 ├── styles.css      # Styling + dark/light themes
 ├── icon.svg        # Node icon
+├── VERSION         # Dashboard version shown in the page footer
 └── README.md
 ```
 

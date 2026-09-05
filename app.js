@@ -215,6 +215,11 @@ function render(data) {
   const progress = sync.progress_percent ?? 0;
   const progressClamped = Math.max(0, Math.min(100, progress));
 
+  const dashboardVersion = (data.dashboard && data.dashboard.version) || "";
+  if ($("dashboard-version")) {
+    $("dashboard-version").textContent = dashboardVersion || "--";
+  }
+
   $("sync-label").textContent = sync.initial_block_download ? "Initial block download" : "Synced";
   $("sync-percent").textContent = `${progress.toFixed ? progress.toFixed(2) : progress}%`;
   $("height-label").textContent = `${fmtNumber(sync.blocks)} / ${fmtNumber(sync.headers)} headers`;

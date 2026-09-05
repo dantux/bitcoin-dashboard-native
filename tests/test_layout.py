@@ -63,6 +63,14 @@ class MainPageLayoutTests(unittest.TestCase):
             desktop_rule.group(1),
         )
 
+    def test_page_footer_shows_dashboard_version(self):
+        html = Path("index.html").read_text()
+        js = Path("app.js").read_text()
+
+        self.assertGreater(html.index("<footer"), html.index("<h2>Peers</h2>"))
+        self.assertIn('id="dashboard-version"', html)
+        self.assertIn("dashboard-version", js)
+
 
 if __name__ == "__main__":
     unittest.main()

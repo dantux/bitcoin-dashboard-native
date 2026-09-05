@@ -39,6 +39,17 @@ def format_header_eyebrow(knots_version, host="knots-pi5"):
     return f"Bitcoin Knots · {knots_version} · {host}"
 
 
+def dashboard_version():
+    value = os.environ.get("APP_VERSION", "").strip()
+    if value:
+        return value
+    path = APP_DIR / "VERSION"
+    try:
+        return path.read_text(encoding="utf-8").strip() or "dev"
+    except OSError:
+        return "dev"
+
+
 def bitcoin_rpc(method, params=None):
     import urllib.request
     import json
@@ -329,7 +340,8 @@ def collect_status():
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "duration_ms": round((time.time() - started) * 1000),
-       "chain": blockchain.get("chain"),
+        "dashboard": {"version": dashboard_version()},
+        "chain": blockchain.get("chain"),
         "sync": {
             "blocks": blockchain.get("blocks"),
             "headers": blockchain.get("headers"),
@@ -382,6 +394,7 @@ def empty_status():
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "duration_ms": 0,
+        "dashboard": {"version": dashboard_version()},
         "chain": None,
         "sync": {},
         "connections": {},
